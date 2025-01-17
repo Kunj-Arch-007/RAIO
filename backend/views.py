@@ -7,7 +7,9 @@ from .models import Contract, Client, Invoice, Expense, Party
 from .forms import ContractForm, ClientForm, InvoiceForm, ExpenseForm, PartyForm
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
+
 from .filter import filter_contracts_by_net_invoice
+from .filter import filter_clients_by_start_date
 import logging
 
 logger = logging.getLogger(__name__)
@@ -64,7 +66,7 @@ def dashboard(request):
 @login_required
 def contract_list(request):
     contracts = filter_contracts_by_net_invoice(request)
-    
+
     if request.method == 'POST' and 'export' in request.POST:
         # Create a workbook and worksheet
         wb = Workbook()
@@ -134,7 +136,7 @@ def contract_delete(request, pk):
 
 @login_required
 def client_list(request):
-    clients = Client.objects.all()
+    clients = filter_clients_by_start_date(request)
 
     if request.method == 'POST' and 'export' in request.POST:
         # Create a workbook and worksheet
