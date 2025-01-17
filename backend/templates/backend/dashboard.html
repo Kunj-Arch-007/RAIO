@@ -1,0 +1,115 @@
+{% extends 'backend/base.html' %}
+{% load static %}
+
+{% block title %}RAIO Dashboard{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+    <h1>Welcome back!</h1>
+    <p class="text-muted">Here's what's happening with your contracts today.</p>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card contracts">
+        <div class="stat-icon">
+            <i class="fas fa-file-contract"></i>
+        </div>
+        <div class="stat-content">
+            <h3>Active Contracts</h3>
+            <div class="stat-value">{{ total_contracts }}</div>
+            <div class="stat-action">
+                <a href="{% url 'contract_list' %}" class="btn-link">
+                    View all contracts
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="stat-card clients">
+        <div class="stat-icon">
+            <i class="fas fa-users"></i>
+        </div>
+        <div class="stat-content">
+            <h3>Healthcare Clients</h3>
+            <div class="stat-value">{{ total_clients }}</div>
+            <div class="stat-action">
+                <a href="{% url 'client_list' %}?status=active" class="btn-link">
+                    View all clients
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="stat-card invoices">
+        <div class="stat-icon">
+            <i class="fas fa-file-invoice-dollar"></i>
+        </div>
+        <div class="stat-content">
+            <h3>Pending Invoices</h3>
+            <div class="stat-value">{{ pending_invoices }}</div>
+            <div class="stat-action">
+                <a href="{% url 'invoice_list' %}?status=pending" class="btn-link">
+                    View pending invoices
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-grid">
+    <div class="dashboard-card recent-activity">
+        <div class="card-header">
+            <h2>Recent Activity</h2>
+            <a href="#" class="btn-link">View all</a>
+        </div>
+        <div class="activity-list">
+            {% for activity in recent_activities %}
+            <div class="activity-item">
+                <div class="activity-icon">
+                    <i class="fas fa-circle"></i>
+                </div>
+                <div class="activity-content">
+                    <p>{{ activity.description }}</p>
+                    <span class="activity-time">{{ activity.timestamp }}</span>
+                </div>
+            </div>
+            {% empty %}
+            <div class="empty-state">
+                <p>No recent activity</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="dashboard-card upcoming-renewals">
+        <div class="card-header">
+            <h2>Upcoming Contract Renewals</h2>
+            <a href="#" class="btn-link">View all</a>
+        </div>
+        <div class="renewals-list">
+            {% for contract in upcoming_renewals %}
+            <div class="renewal-item">
+                <div class="renewal-info">
+                    <h4>{{ contract.client_name }}</h4>
+                    <p>Expires on {{ contract.end_date }}</p>
+                </div>
+                <div class="renewal-status">
+                    <span class="badge badge-warning">{{ contract.days_remaining }} days left</span>
+                </div>
+            </div>
+            {% empty %}
+            <div class="empty-state">
+                <p>No upcoming renewals</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

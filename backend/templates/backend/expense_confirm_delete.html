@@ -1,0 +1,56 @@
+{% extends 'backend/base.html' %}
+
+{% block title %}Confirm Remove expense{% endblock %}
+
+{% block content %}
+
+<style>
+    .main-content {
+      padding: 20px;
+      margin-top: -100px;
+      background-color: #343a40;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .card {
+      background-color: #212529;
+      border: none;
+      border-radius: 8px;
+    }
+    .card-body {
+      color: #ffffff;
+    }
+    h2 {
+      font-weight: bold;
+      color: #ffc107;
+    }
+    .btn-danger {
+      background-color: #dc3545;
+      border: none;
+    }
+    .btn-danger:hover {
+      background-color: #c82333;
+    }
+    .btn-secondary {
+      background-color: #6c757d;
+      border: none;
+    }
+    .btn-secondary:hover {
+      background-color: #5a6268;
+    }
+  </style>
+
+  <div class="main-content">
+    <h2>Confirm Delete</h2>
+    <div class="card">
+      <div class="card-body">
+        <p>Are you sure you want to remove the client <strong>{{ expense.contract }}</strong>?</p>
+        <form method="post">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger">Confirm</button>
+          <a href="{% url 'expense_list' %}" class="btn btn-secondary">Cancel</a>
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock %}

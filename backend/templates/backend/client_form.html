@@ -1,0 +1,270 @@
+{% extends 'backend/base.html' %}
+{% load static %}
+{% block title %}{% if client %}Edit Client{% else %}Create New Client{% endif %}{% endblock %}
+
+{% block content %}
+<style>
+  :root {
+    --primary: #2563eb;
+    --primary-hover: #1d4ed8;
+    --secondary: #64748b;
+    --danger: #dc2626;
+    --background: #0f172a;
+    --card: #1e293b;
+    --text: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --border: #334155;
+    --input-bg: #1e293b;
+    --input-border: #334155;
+    --input-focus: #3b82f6;
+  }
+
+  .form-container {
+    padding: 2rem;
+    background: var(--background);
+    min-height: 100vh;
+  }
+
+  .card {
+    background: var(--card);
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .card-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border);
+    background: rgba(37, 99, 235, 0.1);
+  }
+
+  .card-title {
+    color: var(--text);
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .card-title i {
+    color: var(--primary);
+  }
+
+  .card-body {
+    padding: 2rem;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-group.full-width {
+    grid-column: span 2;
+  }
+
+  .form-label {
+    display: block;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+  }
+
+  .form-control {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
+    border-radius: 0.5rem;
+    color: var(--text);
+    transition: all 0.2s ease;
+  }
+
+  .form-control:focus {
+    outline: none;
+    border-color: var(--input-focus);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+  }
+
+  textarea.form-control {
+    min-height: 120px;
+    resize: vertical;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    width: 100%;
+    border: none;
+    cursor: pointer;
+  }
+
+  .btn-primary {
+    background: var(--primary);
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background: var(--primary-hover);
+  }
+
+  .btn-secondary {
+    background: var(--secondary);
+    color: white;
+  }
+
+  .btn-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+
+  .alert {
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+    background: var(--danger);
+    color: white;
+  }
+
+  .loading-spinner {
+    width: 1.5rem;
+    height: 1.5rem;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s linear infinite;
+    display: none;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  @media (max-width: 768px) {
+    .form-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .form-group.full-width {
+      grid-column: span 1;
+    }
+
+    .btn-group {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<div class="form-container">
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">
+        <i class="fas fa-user-plus"></i>
+        {% if client %}Edit Client{% else %}Add New Client{% endif %}
+      </h2>
+    </div>
+    <div class="card-body">
+      <form id="clientForm" method="post" action="{% if client %}{% url 'client_update' client.id %}{% else %}{% url 'client_create' %}{% endif %}">
+        {% csrf_token %}
+        
+        {% if form.errors %}
+          <div class="alert">
+            Please correct the errors below and try again.
+          </div>
+        {% endif %}
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label" for="id_practice_name">Practice Name</label>
+            {{ form.practice_name }}
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="id_email">Email</label>
+            {{ form.email }}
+          </div>
+
+          <div class="form-group full-width">
+            <label class="form-label" for="id_address">Address</label>
+            {{ form.address }}
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="id_start_date">Start Date</label>
+            {{ form.start_date }}
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="id_end_date">End Date</label>
+            {{ form.end_date }}
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="id_phone_number">Phone Number</label>
+            {{ form.phone_number }}
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="id_website">Website</label>
+            {{ form.website }}
+          </div>
+
+          <div class="form-group full-width">
+            <label class="form-label" for="id_notes">Notes</label>
+            {{ form.notes }}
+          </div>
+        </div>
+
+        <div class="btn-group">
+          <button type="submit" class="btn btn-primary">
+            <span>{% if client %}Save Changes{% else %}Create Client{% endif %}</span>
+            <span class="loading-spinner" id="loadingSpinner"></span>
+          </button>
+          <a href="{% url 'client_list' %}" class="btn btn-secondary">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const form = document.getElementById("clientForm");
+    const loadingSpinner = document.getElementById("loadingSpinner");
+
+    form.addEventListener("submit", function(event) {
+      if (!confirm("Are you sure you want to submit?")) {
+        event.preventDefault();
+        return;
+      }
+      loadingSpinner.style.display = "inline-block";
+    });
+
+    form.querySelectorAll("input, textarea").forEach(field => {
+      field.addEventListener("input", () => {
+        field.setCustomValidity("");
+        field.checkValidity();
+      });
+    });
+
+    document.getElementById("id_start_date").type = 'date';
+    document.getElementById("id_end_date").type = 'date';
+  });
+</script>
+{% endblock %}

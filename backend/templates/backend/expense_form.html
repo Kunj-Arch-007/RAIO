@@ -1,0 +1,260 @@
+{% extends 'backend/base.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}{% if expense %}Edit Expense{% else %}Create New Expense{% endif %}{% endblock %}
+
+{% block content %}
+<style>
+  :root {
+    --primary: #2563eb;
+    --primary-hover: #1d4ed8;
+    --secondary: #64748b;
+    --danger: #dc2626;
+    --background: #0f172a;
+    --card: #1e293b;
+    --text: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --border: #334155;
+    --input-bg: #1e293b;
+    --input-border: #334155;
+    --input-focus: #3b82f6;
+  }
+
+  .form-container {
+    padding: 2rem;
+    background: var(--background);
+    min-height: 100vh;
+  }
+
+  .card {
+    background: var(--card);
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .card-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border);
+    background: rgba(37, 99, 235, 0.1);
+  }
+
+  .card-title {
+    color: var(--text);
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .card-title i {
+    color: var(--primary);
+  }
+
+  .card-body {
+    padding: 2rem;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-group.full-width {
+    grid-column: span 2;
+  }
+
+  .form-label {
+    display: block;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+  }
+
+  .form-control {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
+    border-radius: 0.5rem;
+    color: var(--text);
+    transition: all 0.2s ease;
+  }
+
+  .form-control:focus {
+    outline: none;
+    border-color: var(--input-focus);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+  }
+
+  textarea.form-control {
+    min-height: 120px;
+    resize: vertical;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    width: 100%;
+    border: none;
+    cursor: pointer;
+  }
+
+  .btn-primary {
+    background: var(--primary);
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background: var(--primary-hover);
+  }
+
+  .btn-secondary {
+    background: var(--secondary);
+    color: white;
+  }
+
+  .btn-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+
+  .alert {
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+    background: var(--danger);
+    color: white;
+  }
+
+  .loading-spinner {
+    width: 1.5rem;
+    height: 1.5rem;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s linear infinite;
+    display: none;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  @media (max-width: 768px) {
+    .form-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .form-group.full-width {
+      grid-column: span 1;
+    }
+
+    .btn-group {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow-sm">
+        <div class="card-header text-white text-center">
+          <h2>{% if expense %}Edit Expense{% else %}Add New Expense{% endif %}</h2>
+        </div>
+        <div class="card-body">
+          <form method="post" action="{% if expense %}{% url 'expense_update' expense.id %}{% else %}{% url 'expense_create' %}{% endif %}">
+            {% csrf_token %}
+
+            <!-- Form Fields -->
+            <div class="form-row justify-content-center">
+              <div class="form-group col-md-12 text-center">
+                <label for="id_expense_name" class="form-label">Contract</label>
+                {{ form.contract }}
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-md-6">
+                <label for="id_expense" class="form-label">Expense Amount</label>
+                {{ form.expenses }}
+              </div>
+              <div class="form-group col-md-6">
+                <label for="id_profit_loss" class="form-label">Profit/Loss</label>
+                {{ form.profit_loss }}
+              </div>
+            </div>
+
+            <div class="form-section">
+              <div class="totals-card">
+                <div class="totals-header" >
+                  <h5><i class="fas fa-calculator"></i>Calculations</h5>
+                </div>
+                <div class="totals-content">
+                  <div class="form-group">
+                    <label for="expense_amount_convert" style="width: 250px;"><i class="fas fa-file-invoice-dollar"></i>Expense Amount $ To ₹</label>
+                    <span id="expense_amount_convert" class="total" style="display: inline-block; width: 150px; font-weight: bold; font-size: 20px; color: #ffc107;"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Error Handling -->
+            {% if form.errors %}
+              <div class="alert alert-danger">
+                Please correct the errors below and try again.
+              </div>
+            {% endif %}
+            {% for field in form %}
+              {% if field.errors %}
+                <div class="alert alert-danger">
+                  {{ field.label }}: {{ field.errors|join:", " }}
+                </div>
+              {% endif %}
+            {% endfor %}
+            <script>
+              // Function to convert expense amount to INR
+              function convertExpenseAmount() {
+                var expenseAmount = parseFloat(document.getElementById('id_expenses').value);
+                var profit_loss = parseFloat(document.getElementById('id_profit_loss').value);
+                var conversionRate = 75.0; // Replace with the actual conversion rate
+                var convertedAmount = expenseAmount * conversionRate;
+                document.getElementById('expense_amount_convert').textContent = convertedAmount.toFixed(2);
+              }
+
+              // Call the function when the expense amount input changes
+              document.getElementById('id_expenses').addEventListener('input', convertExpenseAmount);
+
+              // Initial conversion
+              convertExpenseAmount();
+
+            </script>
+            <!-- Submit and Cancel Buttons -->
+            <button type="submit" class="btn btn-primary btn-block mt-3">
+              {% if expense %}Save Changes{% else %}Create Expense{% endif %}
+            </button>
+            <a href="{% url 'expense_list' %}" class="btn btn-secondary btn-block mt-2">Cancel</a>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

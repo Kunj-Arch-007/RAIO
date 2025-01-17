@@ -1,0 +1,53 @@
+{% extends 'backend/base.html' %}
+{% load static %}
+
+{% block title %}Confirm Delete{% endblock %}
+
+{% block content %}
+<style>
+  .container {
+    max-width: 400px;
+    margin-top: 50px;
+    text-align: center;
+  }
+  .card {
+    background-color: #343a40;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  .card-header {
+    background-color: #495057;
+    color: #ffffff;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+  }
+  .card-body {
+    color: #ced4da;
+    padding: 20px;
+  }
+  .btn-danger {
+    background-color: #dc3545;
+    border: none;
+  }
+  .btn-secondary {
+    background-color: #6c757d;
+    border: none;
+  }
+</style>
+
+<div class="container">
+  <div class="card">
+    <div class="card-header">
+      <h2>Confirm Delete</h2>
+    </div>
+    <div class="card-body">
+      <p>Are you sure you want to delete this party  '{{ party.contract }}'?</p>
+      <form method="post" action="{% url 'party_delete' party.id %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Delete</button>
+        <a href="{% url 'party_list' %}" class="btn btn-secondary">Cancel</a>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,395 @@
+{% extends 'backend/base.html' %}
+{% load form_tags %}
+
+{% block title %}{% if contract %}Edit Contract{% else %}Create New Contract{% endif %}{% endblock %}
+
+{% block content %}
+<style>
+  /* Modern CSS Variables */
+  :root {
+    --primary-color: #2563eb;
+    --primary-hover: #1d4ed8;
+    --background: #f8fafc;
+    --card-bg: #ffffff;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --border-color: #e2e8f0;
+    --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --radius: 0.5rem;
+  }
+
+  /* Dark mode support */
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --background: #0f172a;
+      --card-bg: #1e293b;
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --border-color: #334155;
+    }
+  }
+
+  body {
+    background: var(--background);
+    color: var(--text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+  }
+
+  .card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border-color);
+  }
+
+  .card-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    background: rgba(37, 99, 235, 0.05);
+  }
+
+  .card-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-align: center;
+    color: var(--text-primary);
+    margin: 0;
+  }
+
+  .card-body {
+    padding: 1.5rem;
+  }
+
+  .form-section {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: rgba(37, 99, 235, 0.02);
+    border-radius: var(--radius);
+    border: 1px solid var(--border-color);
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+    color: var(--primary-color);
+  }
+
+  .section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+  }
+
+  .form-group {
+    margin-bottom: 1rem;
+  }
+
+  .form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+  }
+
+  .form-control {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    background: var(--card-bg);
+    color: var(--text-primary);
+    transition: border-color 0.15s ease-in-out;
+  }
+
+  .form-control:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+  }
+
+  .totals-card {
+    background: rgba(37, 99, 235, 0.05);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    margin-top: 2rem;
+  }
+
+  .totals-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .total-item {
+    background: var(--card-bg);
+    padding: 1rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--border-color);
+  }
+
+  .total-label {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .total-value {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--primary-color);
+  }
+
+  .btn {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    text-align: center;
+    border-radius: var(--radius);
+    transition: all 0.15s ease-in-out;
+    cursor: pointer;
+    border: none;
+  }
+
+  .btn-primary {
+    background: var(--primary-color);
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background: var(--primary-hover);
+  }
+
+  .btn-secondary {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+  }
+
+  .btn-secondary:hover {
+    background: rgba(37, 99, 235, 0.05);
+  }
+
+  .btn-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+
+  @media (max-width: 768px) {
+    .form-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .totals-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<div class="container">
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">{% if contract %}Edit Contract{% else %}Create New Contract{% endif %}</h2>
+    </div>
+    
+    <div class="card-body">
+      <form id="contractForm" method="post" action="{% if contract %}{% url 'contract_update' contract.id %}{% else %}{% url 'contract_create' %}{% endif %}">
+        {% csrf_token %}
+        
+        {% if form.errors %}
+          <div class="alert">
+            Please correct the errors below and try again.
+          </div>
+        {% endif %}
+
+        <!-- Basic Information -->
+        <div class="form-section">
+          <div class="section-header">
+            <i class="fas fa-building"></i>
+            <h3 class="section-title">Basic Information</h3>
+          </div>
+
+          <div class="form-grid">
+            <!-- <div class="form-group">
+              <label class="form-label" for="constractor">Contractor</label>
+              {{ form.contractor }}
+            </div> -->
+            <div class="form-group">
+              <label class="form-label" for="contractor">Contractor</label>
+              <input type="text" class="form-control" id="id_contractor" name="contractor" value="{{ form.contractor.value|default_if_none:'' }}">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="provider">Provider</label>
+              <input type="text" class="form-control" id="id_provider" name="provider" value="{{ form.provider.value|default_if_none:'' }}">
+              <!-- {{ form.provider }} -->
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="practice_name">Practice Name</label>
+              {{ form.practice_name }}
+            </div>
+        </div>
+
+        <!-- Financial Details -->
+        <div class="form-section">
+          <div class="section-header">
+            <i class="fas fa-dollar-sign"></i>
+            <h3 class="section-title">Financial Details</h3>
+          </div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label" for="client_revenue">Client Revenue</label>
+              {{ form.client_revenue }}
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="agreement_percentage">Agreement Percentage</label>
+              {{ form.agreement_percentage }}
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="client_revenue">Client Revenue</label>
+              {{ form.client_revenue }}
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="agreement_percentage">Agreement Percentage</label>
+              {{ form.agreement_percentage }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Work & Transactions -->
+        <div class="form-section">
+          <div class="section-header">
+            <i class="fas fa-file-invoice"></i>
+            <h3 class="section-title">Work & Transactions</h3>
+          </div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label" for="worked_hours">Worked Hours</label>
+              {{ form.worked_hours }}
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="hourly_rate">Hourly Rate</label>
+              {{ form.hourly_rate }}
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="number_of_transactions">Number of Transactions</label>
+              {{ form.number_of_transactions }}
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="transaction_rate">Transaction Rate</label>
+              {{ form.transaction_rate }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Additional Charges -->
+        <div class="form-section">
+          <div class="section-header">
+            <i class="fas fa-receipt"></i>
+            <h3 class="section-title">Additional Charges</h3>
+          </div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label" for="mail_cost">Mail Cost</label>
+              {{ form.mail_cost }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Totals -->
+        <div class="totals-card">
+          <div class="section-header">
+            <i class="fas fa-calculator"></i>
+            <h3 class="section-title">Contract Summary</h3>
+          </div>
+          <div class="totals-grid">
+            <div class="total-item">
+              <div class="total-label">Agreement Amount</div>
+              <div class="total-value" id="total_agreement_amount">$0.00</div>
+            </div>
+            <div class="total-item">
+              <div class="total-label">Work Amount</div>
+              <div class="total-value" id="total_work_amount_value">$0.00</div>
+            </div>
+            <div class="total-item">
+              <div class="total-label">Transactions Amount</div>
+              <div class="total-value" id="total_transactions_amount_value">$0.00</div>
+            </div>
+            <div class="total-item">
+              <div class="total-label">Mail Cost</div>
+              <div class="total-value" id="mail_cost_value">$0.00</div>
+            </div>
+            <div class="total-item">
+              <div class="total-label">Gross Amount</div>
+              <div class="total-value" id="total_gross_invoice">$0.00</div>
+            </div>
+            <div class="total-item">
+              <div class="total-label">Net Amount</div>
+              <div class="total-value" id="total_net_invoice_amount_value">$0.00</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="btn-group">
+          <button type="submit" class="btn btn-primary">
+            {% if contract %}Save Changes{% else %}Create Contract{% endif %}
+          </button>
+          <a href="{% url 'contract_list' %}" class="btn btn-secondary">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('contractForm');
+    const inputs = form.querySelectorAll('input[type="number"]');
+    
+    function updateCalculations() {
+      const clientRevenue = parseFloat(document.getElementById('id_client_revenue').value) || 0;
+      const agreementPercentage = parseFloat(document.getElementById('id_agreement_percentage').value) || 0;
+      const workedHours = parseFloat(document.getElementById('id_worked_hours').value) || 0;
+      const hourlyRate = parseFloat(document.getElementById('id_hourly_rate').value) || 0;
+      const numberOfTransactions = parseFloat(document.getElementById('id_number_of_transactions').value) || 0;
+      const transactionRate = parseFloat(document.getElementById('id_transaction_rate').value) || 0;
+      const mailCost = parseFloat(document.getElementById('id_mail_cost').value) || 0;
+
+      const agreementAmount = clientRevenue * (agreementPercentage / 100);
+      const workAmount = workedHours * hourlyRate;
+      const transactionsAmount = numberOfTransactions * transactionRate;
+      const grossAmount = agreementAmount + workAmount + transactionsAmount + mailCost;
+      const netAmount = grossAmount - (grossAmount * 0.1);
+
+      document.getElementById('total_agreement_amount').textContent = `$${agreementAmount.toFixed(2)}`;
+      document.getElementById('total_work_amount_value').textContent = `$${workAmount.toFixed(2)}`;
+      document.getElementById('total_transactions_amount_value').textContent = `$${transactionsAmount.toFixed(2)}`;
+      document.getElementById('mail_cost_value').textContent = `$${mailCost.toFixed(2)}`;
+      document.getElementById('total_gross_invoice').textContent = `$${grossAmount.toFixed(2)}`;
+      document.getElementById('total_net_invoice_amount_value').textContent = `$${netAmount.toFixed(2)}`;
+    }
+
+    inputs.forEach(input => {
+      input.addEventListener('input', updateCalculations);
+    });
+
+    // Initial calculation
+    updateCalculations();
+  });
+</script>
+{% endblock %}
