@@ -241,11 +241,14 @@
           <i class="fas fa-file-export"></i>
           Export
         </button>
+        <button type="filter" name="filter_contract" class="btn btn-primary">
+          Filter
+        </button>
+        <a href="{% url 'contract_create' %}" class="btn btn-primary">
+          <i class="fas fa-plus"></i>
+          Add New Contract
+        </a>
       </form>
-      <a href="{% url 'contract_create' %}" class="btn btn-primary">
-        <i class="fas fa-plus"></i>
-        Add New Contract
-      </a>
     </div>
   </div>
 
@@ -263,6 +266,8 @@
           </tr>
         </thead>
         <tbody>
+
+        </form>
           {% for contract in contracts %}
             <tr>
               <td data-label="Contractor">{{ contract.contractor }}</td>

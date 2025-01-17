@@ -1,12 +1,153 @@
-/* Dashboard Styles */
+/* Reset and Base Styles */
+:root {
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --success: #22c55e;
+  --warning: #eab308;
+  --text-primary: #111827;
+  --text-secondary: #4b5563;
+  --text-muted: #6b7280;
+  --border: #e5e7eb;
+  --bg-light: #f9fafb;
+  --card: #ffffff;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background-color: var(--bg-light);
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+/* Dashboard Layout */
+.dashboard {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  min-height: 100vh;
+}
+
+/* Sidebar Styles */
+.sidebar {
+  background-color: var(--card);
+  border-right: 1px solid var(--border);
+  padding: 2rem 1.5rem;
+}
+
+.sidebar-header {
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary);
+  letter-spacing: 0.1em;
+}
+
+.sidebar-nav {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.nav-item:hover {
+  background-color: var(--bg-light);
+  color: var(--primary);
+}
+
+.nav-item.active {
+  background-color: var(--primary);
+  color: white;
+}
+
+.nav-item i {
+  font-size: 1.25rem;
+}
+
+/* Main Content */
+.main-content {
+  padding: 2rem;
+}
+
+/* Header Styles */
 .dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 2rem;
 }
 
-.dashboard-header h1 {
+.header-content h1 {
   font-size: 2rem;
-  font-weight: 600;
+  font-weight: 700;
   margin-bottom: 0.5rem;
+}
+
+.text-muted {
+  color: var(--text-muted);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.btn-icon {
+  position: relative;
+  background: none;
+  border: none;
+  padding: 0.5rem;
+  cursor: pointer;
+  color: var(--text-secondary);
+}
+
+.notification-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: var(--primary);
+  color: white;
+  font-size: 0.75rem;
+  padding: 0.125rem 0.375rem;
+  border-radius: 9999px;
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.avatar {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 9999px;
+  object-fit: cover;
+}
+
+.user-name {
+  font-weight: 500;
+  color: var(--text-primary);
 }
 
 /* Stats Grid */
@@ -25,7 +166,7 @@
   align-items: flex-start;
   gap: 1rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .stat-card:hover {
@@ -55,7 +196,7 @@
 
 .invoices .stat-icon {
   background-color: rgba(234, 179, 8, 0.1);
-  color: #eab308;
+  color: var(--warning);
 }
 
 .stat-content {
@@ -65,13 +206,14 @@
 .stat-content h3 {
   font-size: 0.875rem;
   font-weight: 500;
-  color: var(--text-light);
+  color: var(--text-muted);
   margin-bottom: 0.5rem;
 }
 
 .stat-value {
   font-size: 2rem;
-  font-weight: 600;
+  font-weight: 700;
+  color: var(--text-primary);
   line-height: 1;
   margin-bottom: 1rem;
 }
@@ -125,12 +267,13 @@
 }
 
 .activity-content p {
+  color: var(--text-primary);
   margin-bottom: 0.25rem;
 }
 
 .activity-time {
   font-size: 0.875rem;
-  color: var(--text-light);
+  color: var(--text-muted);
 }
 
 /* Renewals List */
@@ -153,12 +296,13 @@
 .renewal-info h4 {
   font-size: 1rem;
   font-weight: 500;
+  color: var(--text-primary);
   margin-bottom: 0.25rem;
 }
 
 .renewal-info p {
   font-size: 0.875rem;
-  color: var(--text-light);
+  color: var(--text-muted);
   margin: 0;
 }
 
@@ -171,11 +315,11 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  transition: color 0.2s ease;
 }
 
 .btn-link:hover {
   color: var(--primary-hover);
-  text-decoration: none;
 }
 
 .badge {
@@ -187,16 +331,37 @@
 
 .badge-warning {
   background-color: rgba(234, 179, 8, 0.1);
-  color: #eab308;
-}
-
-.empty-state {
-  text-align: center;
-  padding: 2rem;
-  color: var(--text-light);
+  color: var(--warning);
 }
 
 /* Responsive Design */
+@media (max-width: 1024px) {
+  .dashboard {
+      grid-template-columns: 80px 1fr;
+  }
+
+  .sidebar {
+      padding: 1.5rem 0.75rem;
+  }
+
+  .logo {
+      display: none;
+  }
+
+  .nav-item span {
+      display: none;
+  }
+
+  .nav-item {
+      justify-content: center;
+      padding: 0.75rem;
+  }
+
+  .user-name {
+      display: none;
+  }
+}
+
 @media (max-width: 768px) {
   .stats-grid {
       grid-template-columns: 1fr;
@@ -204,6 +369,17 @@
 
   .dashboard-grid {
       grid-template-columns: 1fr;
+  }
+
+  .dashboard-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+  }
+
+  .header-actions {
+      width: 100%;
+      justify-content: space-between;
   }
 
   .stat-card {
