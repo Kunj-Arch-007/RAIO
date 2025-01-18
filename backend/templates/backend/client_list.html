@@ -317,32 +317,35 @@
           <i class="fas fa-file-export"></i>
           Export
         </button>
-        <button type="filter" name="filter_date" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+  
+        <!-- Filter button dropdown -->
+        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           Filter
         </button>
-        <label class="dropdown">
-
-          <div class="dd-button">
-            Dropdown
-          </div>
+        <div class="dropdown-menu">
+          <form method="POST" action="{% url 'client_list' %}">
+            {% csrf_token %}
+            <button type="submit" name="start-date" class="dropdown-item">
+                <i class="fas fa-calendar-alt"></i> Start-Date
+            </button>
+        </form>
+        <form method="POST" action="{% url 'client_list' %}">
+            {% csrf_token %}
+            <button type="submit" name="end-date" class="dropdown-item">
+                <i class="fas fa-calendar-alt"></i> End-Date
+            </button>
+        </form>
         
-          <input type="checkbox" class="dd-input" id="test">
-        
-          <ul class="dd-menu">
-          <button>Start Date</button>
-          <button>End Date</button>
-            
-          </ul>
-          
-        </label>
-        
+        </div>
+  
         <a href="{% url 'client_create' %}" class="btn btn-primary">
           <i class="fas fa-plus"></i>
           Add New Client
         </a>
-      </div>
-    </form>
+      </form>
+    </div>
   </div>
+  
 
   <div class="card">
     <div class="table-responsive">

@@ -22,7 +22,10 @@ def filter_clients_by_start_date(request):
     """
     clients = Client.objects.all()
 
-    if request.method == 'POST' and 'filter_date' in request.POST:
+    if request.method == 'POST' and 'start-date' in request.POST:
         clients = clients.order_by('-start_date')  # Sorting by start_date descending
+    
+    if request.method == "POST" and "end-date" in request.POST:
+        clients = clients.order_by('start_date')
 
     return clients
