@@ -1,0 +1,210 @@
+{% extends 'backend/base.html' %}
+{% load static %}
+
+{% block title %}RAIO Dashboard{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard_Design.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <div class="hero-content">
+            <div class="welcome-text">
+                <h1 class="text-3xl font-bold text-gray-600">
+                    Welcome back, {{ user.first_name|default:user.username }}! 👋
+                </h1>
+                <p class="mt-2 text-gray-600 dark:text-gray-400">
+                    Here's your business overview for today, {{ current_date|date:"F j, Y" }}
+                </p>
+            </div>
+            <div class="action-buttons">
+                <button class="btn-secondary">
+                    <i class="fas fa-download mr-2"></i>
+                    Export Report
+                </button>
+                <button class="btn-primary" onclick="window.location.href='{% url 'contract_create' %}'">
+                    <i class="fas fa-plus mr-2"></i>
+                    New Contract
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="stats-grid">
+        <!-- Active Contracts -->
+        <div class="stat-card">
+            <div class="stat-icon bg-blue-50">
+                <i class="fas fa-file-contract text-blue-500"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-header">
+                    <h3>Active Contracts</h3>
+                    <span class="trend-badge trend-up">
+                        <i class="fas fa-arrow-up"></i>
+                        4.5%
+                    </span>
+                </div>
+                <div class="stat-value">{{ total_contracts }}</div>
+                <div class="stat-footer">
+                    <a href="{% url 'contract_list' %}?status=pending" class="stat-link">
+                        View Contracts
+                        <i class="fas fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Healthcare Clients -->
+        <div class="stat-card">
+            <div class="stat-icon bg-indigo-50">
+                <i class="fas fa-users text-indigo-500"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-header">
+                    <h3>Healthcare Clients</h3>
+                    <span class="trend-badge trend-up">
+                        <i class="fas fa-arrow-up"></i>
+                        2.3%
+                    </span>
+                </div>
+                <div class="stat-value">{{ total_clients }}</div>
+                <div class="stat-footer">
+                    <a href="{% url 'client_list' %}?status=pending" class="stat-link">
+                        View Clients
+                        <i class="fas fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Monthly Revenue -->
+        <div class="stat-card">
+            <div class="stat-icon bg-emerald-50">
+                <i class="fas fa-chart-line text-emerald-500"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-header">
+                    <h3>Monthy Reports</h3>
+                    <span class="trend-badge trend-up">
+                        <i class="fas fa-arrow-up"></i>
+                        8.1%
+                    </span>
+                </div>
+                <div class="stat-value">${{ total_invoices }}</div>
+                <div class="stat-footer">
+                    <a href="{% url 'dashboard' %}?status=pending" class="stat-link">
+                        In Progress
+                        <i class="fas fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Invoices -->
+        <div class="stat-card">
+            <div class="stat-icon bg-amber-50">
+                <i class="fas fa-file-invoice-dollar text-amber-500"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-header">
+                    <h3>Pending Invoices</h3>
+                    <span class="status-badge warning">
+                        {{ pending_invoices }} pending
+                    </span>
+                </div>
+                <div class="stat-value">${{ total_pending_amount }}</div>
+                <div class="stat-footer">
+                    <a href="{% url 'invoice_list' %}?status=pending" class="stat-link">
+                        View pending invoices
+                        <i class="fas fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="content-grid">
+        <!-- Recent Activity -->
+        <div class="content-card">
+            <div class="card-header">
+                <h2>Recent Activity</h2>
+                <button class="btn-text">View all</button>
+            </div>
+            <div class="activity-timeline">
+                {% for activity in recent_activities %}
+                <div class="timeline-item">
+                    <div class="timeline-icon">
+                        {% if activity.type == 'contract' %}
+                            <i class="fas fa-file-contract"></i>
+                        {% elif activity.type == 'client' %}
+                            <i class="fas fa-user-plus"></i>
+                        {% elif activity.type == 'invoice' %}
+                            <i class="fas fa-file-invoice-dollar"></i>
+                        {% else %}
+                            <i class="fas fa-bell"></i>
+                        {% endif %}
+                    </div>
+                    <div class="timeline-content">
+                        <p class="timeline-text">{{ activity.description }}</p>
+                        <span class="timeline-time">{{ activity.timestamp }}</span>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="empty-state">
+                    <i class="fas fa-inbox text-4xl mb-3"></i>
+                    <h3>No recent activity</h3>
+                    <p>New activities will appear here</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Upcoming Renewals -->
+        <div class="content-card">
+            <div class="card-header">
+                <h2>Upcoming Renewals</h2>
+                <button class="btn-text">View all</button>
+            </div>
+            <div class="renewals-list">
+                {% for contract in upcoming_renewals %}
+                <div class="renewal-item">
+                    <div class="renewal-info">
+                        <div class="client-avatar">
+                            {% if contract.client_logo %}
+                                <img src="{{ contract.client_logo.url }}" alt="{{ contract.client_name }}">
+                            {% else %}
+                                <i class="fas fa-building"></i>
+                            {% endif %}
+                        </div>
+                        <div class="client-details">
+                            <h4>{{ contract.client_name }}</h4>
+                            <p>Expires {{ contract.end_date|date:"M j, Y" }}</p>
+                        </div>
+                    </div>
+                    <div class="renewal-status">
+                        {% if contract.days_remaining <= 30 %}
+                            <span class="status-badge danger">{{ contract.days_remaining }} days left</span>
+                        {% elif contract.days_remaining <= 60 %}
+                            <span class="status-badge warning">{{ contract.days_remaining }} days left</span>
+                        {% else %}
+                            <span class="status-badge success">{{ contract.days_remaining }} days left</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% empty %}
+                <div class="empty-state">
+                    <i class="fas fa-calendar-check text-4xl mb-3"></i>
+                    <h3>No upcoming renewals</h3>
+                    <p>All contracts are up to date</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

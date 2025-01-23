@@ -1,0 +1,50 @@
+body {
+  background-color: #1a1a1a; /* Dark background color */
+  color: #f8f9fa; /* Light text color */
+}
+
+.card {
+  border: none; /* Remove default border */
+  border-radius: 10px; /* Rounded corners */
+  background-color: #2c2c2c; /* Dark card background */
+}
+
+.card-header {
+  border-radius: 10px 10px 0 0; /* Rounded top corners */
+}
+
+.form-label {
+  font-weight: 600; /* Slightly bold labels */
+  color: #f8f9fa; /* Light label color */
+}
+
+input, textarea {
+  border-radius: 5px; /* Rounded input fields */
+  box-shadow: none; /* Remove default shadow */
+  border: 1px solid #444; /* Darker border for input fields */
+  background-color: #3c3c3c; /* Dark background for input fields */
+  color: #f8f9fa; /* Light text for inputs */
+}
+
+input:focus, textarea:focus {
+  border-color: #007bff; /* Blue border on focus */
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Add shadow on focus */
+}
+
+.hover-effect {
+  transition: background-color 0.3s ease-in-out, transform 0.2s; /* Add transform for smooth effect */
+}
+
+.hover-effect:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+  color: #fff;
+  border-color: #0056b3; /* Match border color with background on hover */
+  transform: translateY(-2px); /* Slight lift effect */
+}
+
+/* Alert message styling */
+.alert {
+  margin-top: 20px; /* Space above alerts */
+  background-color: #dc3545; /* Red background for alert */
+  color: white; /* White text for alert */
+}

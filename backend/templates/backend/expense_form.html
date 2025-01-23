@@ -1,0 +1,294 @@
+{% extends 'backend/base.html' %}
+{% load static %}
+
+{% block title %}
+{% if expense %} Edit Expense {% else %} Create New Expense {% endif %}
+{% endblock %}
+
+{% block content %}
+<style>
+  /* expense Form Specific Styles */
+  .expense-form {
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: 2rem;
+    background: var(--card);
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .expense-form__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .expense-form__header h2 {
+    font-size: 1.875rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .expense-form__header i {
+    color: var(--primary);
+  }
+
+  .expense-form__body {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .expense-form__body .expense-form__group {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .expense-form__body .expense-form__group label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+  }
+
+  .expense-form__body .expense-form__group input,
+  .expense-form__body .expense-form__group textarea,
+  .expense-form__body .expense-form__group select {
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    background-color: var(--input-bg);
+    color: var(--text);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .expense-form__body .expense-form__group input:focus,
+  .expense-form__body .expense-form__group textarea:focus,
+  .expense-form__body .expense-form__group select:focus {
+    border-color: var(--primary);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.2);
+  }
+
+  .expense-form__body .expense-form__group textarea {
+    min-height: 120px;
+    resize: vertical;
+  }
+
+  .expense-form__body .expense-form__group--notes {
+    grid-column: span 3;
+  }
+
+  .expense-form__footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+
+  .expense-form__footer .btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    border-radius: 0.5rem;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+
+  .expense-form__footer .btn--primary {
+    background-color: var(--primary);
+    color: white;
+  }
+
+  .expense-form__footer .btn--primary:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-2px);
+  }
+
+  .expense-form__footer .btn--secondary {
+    background-color: var(--secondary);
+    color: white;
+  }
+
+  .expense-form__footer .btn--secondary:hover {
+    background-color: var(--secondary-dark);
+    transform: translateY(-2px);
+  }
+
+
+  .expense-form__footer .loading-spinner {
+    display: none;
+    margin-left: 10px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    animation: spin 1s linear infinite;
+  }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+    color: var(--primary-color);
+  }
+
+  .totals-card {
+    background: rgba(37, 99, 235, 0.05);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    margin-top: 2rem;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .expense-form__body .alert {
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    background-color: var(--danger);
+    color: white;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+  }
+
+  @media (max-width: 768px) {
+    .expense-form {
+      padding: 1.5rem;
+    }
+
+    .expense-form__body {
+      grid-template-columns: 1fr;
+    }
+
+    .expense-form__footer {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .expense-form__footer .btn {
+      width: 100%;
+    }
+  }
+</style>
+
+<div class="expense-form">
+  <div class="expense-form__header">
+    <h2>
+      <i class="fas fa-user-plus"></i>
+      {% if expense %} Edit Expense {% else %} Add New Expense {% endif %}
+    </h2>
+  </div>
+
+  <form method="post"
+    action="{% if expense %}{% url 'expense_update' expense.id %}{% else %}{% url 'expense_create' %}{% endif %}">
+    {% csrf_token %}
+
+    <!-- Form Fields -->
+    <div class="expense-form__body">
+      <div class="expense-form__group">
+        <label for="id_expense_name" class="form-label">Contract</label>
+        {{ form.contract }}
+      </div>
+    </div>
+
+    <div class="expense-form__body">
+      <div class="expense-form__group">
+        <label for="id_expenses" class="form-label">Expense Amount</label>
+        {{ form.expenses }}
+      </div>
+      <div class="expense-form__group">
+        <label for="id_profit_loss" class="form-label">Profit/Loss</label>
+        {{ form.profit_loss }}
+      </div>
+    </div>
+
+    <div class="totals-card">
+      <div class="section-header">
+        <i class="fas fa-calculator"></i>
+        <h3 class="section-title">Calculations</h3>
+      </div>
+      <div class="form-grid-2">
+        <label for="expense_amount_convert"><i class="fas fa-file-invoice-dollar"></i> Expense Amount $ -> ₹</label>
+        <span id="expense_amount_convert" class="total"
+          style="font-weight: bold; font-size: 20px; color: #ffc107;">
+        {if expense}
+          {{ expense.expenses }}
+        {else}
+          0.00
+        </span>
+      </div>
+    </div>
+
+    
+
+    <!-- Error Handling -->
+    {% if form.errors %}
+    <div class="alert alert-danger">
+      Please correct the errors below and try again.
+    </div>
+    {% endif %}
+
+    {% for field in form %}
+    {% if field.errors %}
+    <div class="alert alert-danger">
+      {{ field.label }}: {{ field.errors|join:", " }}
+    </div>
+    {% endif %}
+    {% endfor %}
+
+    <!-- Submit and Cancel Buttons -->
+    <div class="expense-form__footer">
+      <a href="{% url 'expense_list' %}" class="btn btn--primary">Cancel</a>
+      <button type="submit" class="btn btn--primary">
+        {% if expense %} Save Changes {% else %} Create Expense {% endif %}
+      </button>
+    </div>
+  </form>
+
+</div>
+
+<!-- Javascript for Conversion -->
+<script>
+  function convertExpenseAmount() {
+    var expenseAmount = parseFloat(document.getElementById('id_expenses').value);
+    var profit_loss = parseFloat(document.getElementById('id_profit_loss').value);
+    var conversionRate = 75.0;  // Example conversion rate
+    var convertedAmount = expenseAmount * conversionRate;
+    document.getElementById('expense_amount_convert').textContent = convertedAmount.toFixed(2);
+  }
+
+  document.getElementById('id_expenses').addEventListener('input', convertExpenseAmount);
+
+  convertExpenseAmount();
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("expenseForm");
+    const loadingSpinner = document.getElementById("loadingSpinner");
+    const submitButton = document.getElementById("submitBtn");
+
+    form.addEventListener("submit", function (event) {
+      loadingSpinner.style.display = "inline-block"; // Show spinner when form is submitting
+      submitButton.disabled = true; // Disable the submit button
+    });
+
+    form.querySelectorAll("input, textarea").forEach(field => {
+      field.addEventListener("input", () => {
+        field.setCustomValidity("");
+        field.checkValidity();
+      });
+    });
+
+    document.getElementById("id_start_date").type = 'date';
+    document.getElementById("id_end_date").type = 'date';
+  });
+</script>
+
+{% endblock %}

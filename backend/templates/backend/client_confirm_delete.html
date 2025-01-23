@@ -1,0 +1,36 @@
+{% extends 'backend/base.html' %}
+{% load static %}
+{% block title %}Confirm Remove client{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/deletePage.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+  <!-- Heading Section -->
+  <div class="form-header">
+    <h2>
+      <i class="fas fa-trash-alt"></i>
+      Confirm Remove client
+    </h2>
+  </div>
+
+  <div class="card-body">
+    <div class="alert alert-warning">
+      <p>Are you sure you want to permanently remove the client for <strong>{{ client.clientor }}</strong>? This
+        action cannot be undone.</p>
+    </div>
+
+    <form method="post" action="{% url 'client_delete' client.id %}">
+      {% csrf_token %}
+      <div class="form-footer">
+        <a href="{% url 'client_list' %}" class="btn btn-secondary" id="cancelBtn">Cancel</a>
+        <button type="submit" class="btn btn-danger" id="deleteBtn">
+          Delete
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

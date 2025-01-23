@@ -1,0 +1,163 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}RAIO Contract Management{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="transition-colors duration-300">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 transform transition-all duration-300 ease-in-out lg:translate-x-0">
+            <div class="flex items-center justify-between h-16 px-6 border-b border-opacity-10">
+                <a href="{% url 'dashboard' %}" class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center shadow-lg">
+                        <i class="fas fa-hospital-user text-white text-xl"></i>
+                    </div>
+                    <span class="text-xl font-bold text-white">RAIO</span>
+                </a>
+                <button id="closeSidebar" class="lg:hidden text-white hover:text-opacity-80 transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <nav class="mt-6 px-4">
+                <a href="{% url 'dashboard' %}" class="sidebar-link mb-2 {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                    <i class="fas fa-chart-line w-5 h-5 mr-3"></i>
+                    <span class="font-medium">Dashboard</span>
+                </a>
+
+                <a href="{% url 'client_list' %}" class="sidebar-link mb-2 {% if 'client' in request.path %}active{% endif %}">
+                    <i class="fas fa-users w-5 h-5 mr-3"></i>
+                    <span class="font-medium">Healthcare Clients</span>
+                </a>
+
+                <a href="{% url 'contract_list' %}" class="sidebar-link mb-2 {% if 'contract' in request.path %}active{% endif %}">
+                    <i class="fas fa-file-contract w-5 h-5 mr-3"></i>
+                    <span class="font-medium">Service Agreements</span>
+                </a>
+
+                <div class="mt-8 mb-4">
+                    <p class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        Financials
+                    </p>
+                </div>
+
+                <a href="{% url 'expense_list' %}" class="sidebar-link mb-2 {% if 'expense' in request.path %}active{% endif %}">
+                    <i class="fas fa-money-bill-wave w-5 h-5 mr-3"></i>
+                    <span class="font-medium">Operational Costs</span>
+                </a>
+
+                <a href="{% url 'invoice_list' %}" class="sidebar-link mb-2 {% if 'invoice' in request.path %}active{% endif %}">
+                    <i class="fas fa-file-invoice-dollar w-5 h-5 mr-3"></i>
+                    <span class="font-medium">Revenue Invoices</span>
+                </a>
+
+                <a href="{% url 'party_list' %}" class="sidebar-link mb-2 {% if 'party' in request.path %}active{% endif %}">
+                    <i class="fas fa-handshake w-5 h-5 mr-3"></i>
+                    <span class="font-medium">Business Partners</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col min-h-screen lg:pl-64">
+            <!-- Top Navigation -->
+            <header class="header z-40">
+                <div class="h-16 px-6 flex items-center justify-between border-b border-black">
+                    <button id="menuToggle" class="lg:hidden nav-button">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+
+                    <div class="flex items-center space-x-4 ml-auto">
+                        <div class="relative">
+                            <button class="nav-button relative">
+                                <i class="fas fa-bell text-xl"></i>
+                                <span class="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full"></span>
+                            </button>
+                        </div>
+
+                        <div class="relative">
+                            <button id="userMenuBtn" class="flex items-center space-x-3 nav-button">
+                                <div class="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center shadow">
+                                    <i class="fas fa-user text-white"></i>
+                                </div>
+                                <span class="font-medium">{{ user.username }}</span>
+                                <i class="fas fa-chevron-down text-sm"></i>
+                            </button>
+
+                            <div id="userDropdown" class="hidden absolute right-0 mt-2 w-48 rounded-xl shadow-lg py-1 z-50 card">
+                                <a href="{% url 'logout' %}" class="block px-3 py-2 text-sm text-center hover:bg-surface-hover transition-colors">
+                                    <i class="fas fa-sign-out-alt mr-2"></i>
+                                    Logout
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main Content Area -->
+            <main class="flex-1 overflow-y-auto p-6 bg-background">
+                {% block content %}{% endblock %}
+            </main>
+
+            <!-- Footer -->
+            <footer class="border-t py-4 px-6">
+                <p class="text-center text-sm text-text-secondary">
+                    &copy; {{ current_year }} RAIO Contract Management System. All rights reserved.
+                </p>
+            </footer>
+        </div>
+    </div>
+
+    <script>
+        // Sidebar Toggle
+        const sidebar = document.getElementById('sidebar');
+        const menuToggle = document.getElementById('menuToggle');
+        const closeSidebar = document.getElementById('closeSidebar');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('-translate-x-full');
+            document.body.classList.toggle('sidebar-active');
+        }
+
+        menuToggle.addEventListener('click', toggleSidebar);
+        closeSidebar.addEventListener('click', toggleSidebar);
+
+        // User Dropdown
+        const userMenuBtn = document.getElementById('userMenuBtn');
+        const userDropdown = document.getElementById('userDropdown');
+
+        userMenuBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            userDropdown.classList.toggle('hidden');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!userMenuBtn.contains(e.target)) {
+                userDropdown.classList.add('hidden');
+            }
+        });
+
+        // Handle window resize
+        function handleResize() {
+            if (window.innerWidth >= 1024) {
+                sidebar.classList.remove('-translate-x-full');
+                document.body.classList.remove('sidebar-active');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+            }
+        }
+
+        window.addEventListener('resize', handleResize);
+        handleResize();
+    </script>
+</body>
+</html>

@@ -1,0 +1,271 @@
+{% extends 'backend/base.html' %}
+{% load static %}
+
+{% block title %}
+{% if client %} Edit Client {% else %} Create New Client {% endif %}
+{% endblock %}
+
+{% block content %}
+<style>
+  /* Client Form Specific Styles */
+  .client-form-container {
+    max-width: 1500px;
+    /* Limit the form width */
+    margin: 0 auto;
+    padding: 2rem;
+    background: var(--card);
+    /* Card background color */
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .client-form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .client-form-header h2 {
+    font-size: 1.875rem;
+    /* Adjust title size */
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .client-form-header i {
+    color: var(--primary);
+  }
+
+  .client-form-body {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    /* 3 columns for larger screens */
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+    /* Added margin to separate fields from footer */
+  }
+
+  .client-form-body .form-group {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .client-form-body .form-group label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+  }
+
+  .client-form-body .form-group input,
+  .client-form-body .form-group textarea,
+  .client-form-body .form-group select {
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    background-color: var(--input-bg);
+    color: var(--text);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .client-form-body .form-group input:focus,
+  .client-form-body .form-group textarea:focus,
+  .client-form-body .form-group select:focus {
+    border-color: var(--primary);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.2);
+  }
+
+  .client-form-body .form-group textarea {
+    min-height: 120px;
+    resize: vertical;
+  }
+
+  .client-form-body .form-group.notes {
+    grid-column: span 3;
+    /* Make Notes field span across all columns */
+  }
+
+  .client-form-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+
+  .client-form-footer .btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    border-radius: 0.5rem;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+
+  .client-form-footer .btn-primary {
+    background-color: var(--primary);
+    color: white;
+  }
+
+  .client-form-footer .btn-primary:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-2px);
+  }
+
+  .client-form-footer .btn-secondary {
+    background-color: var(--secondary);
+    color: white;
+  }
+
+  .client-form-footer .btn-secondary:hover {
+    background-color: var(--secondary-dark);
+    transform: translateY(-2px);
+  }
+
+  /* Loading Spinner */
+  .client-form-footer .loading-spinner {
+    display: none;
+    /* Initially hide the spinner */
+    margin-left: 10px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* Error Messages Styling */
+  .client-form-body .alert {
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    background-color: var(--danger);
+    color: white;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .client-form-container {
+      padding: 1.5rem;
+    }
+
+    .client-form-body {
+      grid-template-columns: 1fr;
+      /* Single column on smaller screens */
+    }
+
+    .client-form-footer {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .client-form-footer .btn {
+      width: 100%;
+    }
+  }
+</style>
+
+<div class="client-form-container">
+  <div class="client-form-header">
+    <h2>
+      <i class="fas fa-user-plus"></i>
+      {% if client %} Edit Client {% else %} Add New Client {% endif %}
+    </h2>
+  </div>
+
+  <form id="clientForm" method="post"
+    action="{% if client %}{% url 'client_update' client.id %}{% else %}{% url 'client_create' %}{% endif %}">
+    {% csrf_token %}
+
+    {% if form.errors %}
+    <div class="alert">
+      Please correct the errors below and try again.
+    </div>
+    {% endif %}
+
+    <div class="client-form-body">
+      <div class="form-group">
+        <label for="id_practice_name">Enter Practice Name</label>
+        {{ form.practice_name }}
+      </div>
+
+      <div class="form-group">
+        <label for="id_email">Enter Email</label>
+        {{ form.email }}
+      </div>
+
+      <div class="form-group">
+        <label for="id_address">Enter Address</label>
+        {{ form.address }}
+      </div>
+
+      <div class="form-group">
+        <label for="id_start_date">Select Start Date</label>
+        {{ form.start_date }}
+      </div>
+
+      <div class="form-group">
+        <label for="id_end_date">Select End Date</label>
+        {{ form.end_date }}
+      </div>
+
+      <div class="form-group">
+        <label for="id_phone_number">Enter Phone Number</label>
+        {{ form.phone_number }}
+      </div>
+
+      <div class="form-group">
+        <label for="id_website">Enter Website</label>
+        {{ form.website }}
+      </div>
+
+      <div class="form-group notes">
+        <label for="id_notes">Type Reference Notes</label>
+        {{ form.notes }}
+      </div>
+    </div>
+
+    <div class="client-form-footer">
+      <a href="{% url 'client_list' %}" class="btn btn-primary">Cancel</a>
+      <span class="loading-spinner" id="loadingSpinner"></span>
+      <button type="submit" class="btn btn-primary" id="submitBtn">
+        <span>{% if client %} Save Changes {% else %} Create Client {% endif %}</span>
+      </button>
+    </div>
+  </form>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("clientForm");
+    const loadingSpinner = document.getElementById("loadingSpinner");
+    const submitButton = document.getElementById("submitBtn");
+
+    form.addEventListener("submit", function (event) {
+      loadingSpinner.style.display = "inline-block"; // Show spinner when form is submitting
+      submitButton.disabled = true; // Disable the submit button
+    });
+
+    form.querySelectorAll("input, textarea").forEach(field => {
+      field.addEventListener("input", () => {
+        field.setCustomValidity("");
+        field.checkValidity();
+      });
+    });
+
+    document.getElementById("id_start_date").type = 'date';
+    document.getElementById("id_end_date").type = 'date';
+  });
+</script>
+
+{% endblock %}

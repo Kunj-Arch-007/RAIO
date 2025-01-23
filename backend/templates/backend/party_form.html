@@ -1,0 +1,337 @@
+{% extends 'backend/base.html' %}
+{% load static %}
+
+{% block title %}
+{% if party %}Edit Business Partner{% else %}New Business Partner{% endif %}
+{% endblock %}
+
+{% block content %}
+<style>
+  .party-form-container {
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: 2rem;
+    background: var(--card-bg);
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .party-form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .party-form-header h2 {
+    font-size: 1.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .party-form-header i {
+    color: var(--primary);
+  }
+
+  /* CSS Variables */
+  :root {
+    --primary-color: #2563eb;
+    --primary-hover: #1d4ed8;
+    --background: #f8fafc;
+    --card-bg: #ffffff;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --border-color: #e2e8f0;
+    --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --radius: 0.5rem;
+  }
+
+  body {
+    background: var(--background);
+    color: var(--text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+  }
+
+  .card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border-color);
+  }
+
+  .form-section {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: rgba(37, 99, 235, 0.02);
+    border-radius: var(--radius);
+    border: 1px solid var(--border-color);
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+    color: var(--primary-color);
+  }
+
+  .section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    grid-auto-rows: minmax(100px, auto);
+  }
+
+  .form-group {
+    margin-bottom: 1rem;
+  }
+
+  .form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+  }
+
+  .form-control {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    background: var(--card-bg);
+    color: var(--text-primary);
+    transition: border-color 0.15s ease-in-out;
+  }
+
+  .form-control:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+  }
+
+  .party-form-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+  }
+
+  .party-form-footer .btn {
+    padding: 0.7rem 1.5rem;
+    /* Adjust padding for a consistent button size */
+    font-size: 1rem;
+    border-radius: 0.5rem;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-sizing: border-box;
+    /* Ensures padding and border don't affect total size */
+  }
+
+  .party-form-footer .btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+  }
+
+  .party-form-footer .btn-primary:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-2px);
+  }
+
+  .party-form-footer .btn-secondary {
+    background-color: var(--secondary);
+    color: white;
+  }
+
+  .party-form-footer .btn-secondary:hover {
+    background-color: var(--secondary-dark);
+    transform: translateY(-2px);
+  }
+
+  .totals-card {
+    background: rgba(37, 99, 235, 0.05);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    margin-top: 2rem;
+  }
+
+  .card-body {
+    padding: 1.5rem;
+  }
+
+  @media (max-width: 768px) {
+    .form-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .arrow {
+    display: inline-block;
+    margin: 0 1rem;
+    font-size: 2rem;
+    color: #ffc107;
+  }
+</style>
+
+<div class="party-form-container">
+  <div class="party-form-header">
+    <h2>
+      <i class="fas fa-user-plus"></i>
+      {% if party %} Edit party {% else %} Add New party {% endif %}
+    </h2>
+  </div>
+
+
+  <div class="card-body">
+    <form method="post" id="partyForm" class="space-y-6">
+      {% csrf_token %}
+
+      <!-- Partner Information Section -->
+      <div class="form-section">
+        <div class="section-header">
+          <i class="fas fa-user text-primary"></i>
+          <h3 class="section-title">Partner Information</h3>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="partyName" class="form-label">Enter Partner Name</label>
+            {{ form.party_name }}
+          </div>
+
+          <div class="form-group">
+            <label for="contract" class="form-label">Select Contract Reference</label>
+            {{ form.contract }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Revenue Share Section -->
+      <div class="form-section">
+        <div class="section-header">
+          <i class="fas fa-calculator text-primary"></i>
+          <h3 class="section-title">Revenue Share</h3>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="partyPercentage" class="form-label">Revenue Share (%)</label>
+            <select id="partyPercentage" name="party_percentage" class="form-control" required>
+              <option value="1">One (1%)</option>
+              <option value="2">Two (2%)</option>
+              <option value="3">Three (3%)</option>
+              <option value="4">Four (4%)</option>
+              <option value="5">Five (5%)</option>
+              <option value="6">Six (6%)</option>
+              <option value="7">Seven (7%)</option>
+              <option value="8">Eight (8%)</option>
+              <option value="9">Nine (9%)</option>
+              <option value="10">Ten (10%)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="partyAmount" class="form-label">Enter Amount ($)</label>
+            {{ form.party_amount}}
+          </div>
+        </div>
+      </div>
+
+      <!-- Calculations Section -->
+      <div class="totals-card">
+        <div class="section-header">
+          <i class="fas fa-calculator text-primary"></i>
+          <h3 class="section-title">Calculations</h3>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Amount (USD → INR)</label>
+            <div>
+              <span id="amountDisplay" class="total" style="font-weight: bold; font-size: 30px; color: #ffc107;">$0.00</span>
+              <span class="arrow">→</span>
+              <span id="amountConvert" class="total" style="font-weight: bold; font-size: 30px; color: #ffc107;">₹0.00</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Revenue Share Amount</label>
+            <div>
+              <span id="percentageResult" class="total" style="font-weight: bold; font-size: 30px; color: #ffc107;">$0.00</span>
+              <span class="arrow">→</span>
+              <span id="percentageResultInr" class="total" style="font-weight: bold; font-size: 30px; color: #ffc107;">₹0.00</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Footer -->
+      <div class="party-form-footer">
+        <a href="{% url 'party_list' %}" class="btn btn-primary">Cancel</a>
+        <span class="loading-spinner" id="loadingSpinner"></span>
+        <button type="submit" class="btn btn-primary" id="submitBtn">
+          <span>{% if party %} Save Changes {% else %} Create Partner {% endif %}</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const form = document.getElementById('partyForm');
+  const amountField = document.getElementById('id_party_amount');  // Updated to match the Django form field id
+  const percentageField = document.getElementById('partyPercentage');
+
+  const percentageMapping = {
+    '1': 1, '2': 2, '3': 3, '4': 4, '5': 5,
+    '6': 6, '7': 7, '8': 8, '9': 9, '10': 10
+  };
+
+  function calculateAmounts() {
+    const amount = parseFloat(amountField.value) || 0;
+    const percentage = percentageMapping[percentageField.value] || 0;
+    const usdToInrRate = 80;
+
+    const percentageAmount = (amount * (percentage / 100));
+    const amountInInr = amount * usdToInrRate;
+    const percentageAmountInr = percentageAmount * usdToInrRate;
+
+    const elements = {
+      'amountDisplay': `$${amount.toFixed(2)}`,
+      'amountConvert': `₹${amountInInr.toFixed(2)}`,
+      'percentageResult': `$${percentageAmount.toFixed(2)}`,
+      'percentageResultInr': `₹${percentageAmountInr.toFixed(2)}`
+    };
+
+    for (const [id, value] of Object.entries(elements)) {
+      const element = document.getElementById(id);
+      element.style.opacity = '0';
+      setTimeout(() => {
+        element.textContent = value;
+        element.style.opacity = '1';
+      }, 150);
+    }
+  }
+
+  amountField.addEventListener('input', calculateAmounts);
+  percentageField.addEventListener('change', calculateAmounts);
+
+  calculateAmounts();  // Initial calculation
+
+});
+
+</script>
+
+{% endblock %}

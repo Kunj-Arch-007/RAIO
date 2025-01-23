@@ -1,0 +1,36 @@
+{% extends 'backend/base.html' %}
+
+{% block title %}Pending Invoices{% endblock %}
+
+{% block content %}
+<h2>Pending Invoices</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Invoice Number</th>
+            <th>Client</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for invoice in pending_invoices %}
+        <tr>
+            <td>{{ invoice.invoice_number }}</td>
+            <td>{{ invoice.client }}</td>
+            <td>{{ invoice.amount }}</td>
+            <td>{{ invoice.status }}</td>
+            <td>
+                <a href="{% url 'invoice_detail' invoice.id %}">View</a>
+                <a href="{% url 'mark_as_paid' invoice.id %}">Mark as Paid</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="5">No pending invoices available.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

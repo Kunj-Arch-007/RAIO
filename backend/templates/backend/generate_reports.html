@@ -1,0 +1,18 @@
+{% extends 'backend/base.html' %}
+
+{% block title %}Generate Reports{% endblock %}
+
+{% block content %}
+<h2>Generate Reports</h2>
+<form method="post">
+    {% csrf_token %}
+    <label for="report_type">Select Report Type:</label>
+    <select id="report_type" name="report_type">
+        <option value="monthly">Monthly Report</option>
+        <option value="yearly">Yearly Report</option>
+    </select>
+    <label for="date_range">Date Range:</label>
+    <input type="text" id="date_range" name="date_range" placeholder="e.g., 2024-01-01 to 2024-01-31">
+    <button type="submit">Generate Report</button>
+</form>
+{% endblock %}

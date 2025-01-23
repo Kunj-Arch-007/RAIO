@@ -1,0 +1,69 @@
+/* Ensure styles are specific to the dashboard */
+.dashboard {
+  margin-top: 2rem; /* Use rem units for better responsiveness */
+}
+
+.card {
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transition: all 0.2s ease-in-out; /* Add smooth hover effects */
+  box-sizing: border-box; /* Ensure consistent sizing */
+}
+
+.card:hover {
+  transform: scale(1.01); /* More subtle hover scale */
+  opacity: 0.95; /* Add slight opacity change on hover */
+}
+
+.card-body {
+  padding: 1.5rem; /* Adjust padding for better content spacing */
+}
+
+.card-text {
+  font-size: 1.1rem;
+  color: #666;
+  font-weight: bold; /* Make card text stand out */
+
+}   
+
+.card-title {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: #333;
+
+  font-weight: bold; /* Make card titles stand out */
+}
+
+.display-4 {
+  font-size: 2.5rem;
+  font-weight: bold; /* Make numbers more prominent */
+}
+
+/* Improved card colors with better contrast */
+.card.bg-primary {
+  background-color: #007bff;
+  color: #fff; /* Ensure white text for better contrast */
+}
+
+.card.bg-info {
+  background-color: #17a2b8;
+  color: #fff;
+}
+
+.card.bg-warning {
+  background-color: #ffc107;
+  color: #000; /* Black text for better contrast on yellow background */
+}
+
+/* Add a call-to-action button style */
+.btn-light {
+  background-color: #f8f9fa;
+  border-color: #f8f9fa;
+  color: #000;
+  transition: all 0.3s ease-in-out;
+}
+
+.btn-light:hover {
+  background-color: #e2e6ea;
+  border-color: #e2e6ea;
+}
